@@ -3,6 +3,10 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'ttl.sh/myapp:2h'
+        SSH_KEY = '/var/lib/jenkins/.ssh/key-jenkins'
+        TARGET_USER = 'laborant'
+        TARGET_HOST = '172.16.0.3'
+        TARGET_PATH = '/home/laborant'
     }
 
     stages {
@@ -19,15 +23,9 @@ pipeline {
         }
         stage('Deploy to Target') {
             steps {
-                sshagent (credentials: ['key-jenkins']) {
-                    sh """
-                        scp -o StrictHostKeyChecking=no index.js laborant@172.16.0.3:/home/laborant/
-                        ssh -o StrictHostKeyChecking=no laborant@172.16.0.3 '
-                            pkill -f "node index.js" || true
-                            nohup node /home/laborant/index.js > output.log 2>&1 &
-                        '
-                    """
-                }
+                sh "scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -r ./target-folder ${TARGET_USER}@${TARGET_HOST}:${TARGET_PATH}"
+                
+                sh "ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${TARGET_USER}@${TARGET_HOST} 'cd ${TARGET_PATH} && ./deploy-script.sh'"
             }
         }
 
