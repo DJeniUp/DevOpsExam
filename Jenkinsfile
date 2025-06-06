@@ -43,6 +43,7 @@ pipeline {
                 sh """
                 docker build -t ${IMAGE_NAME} .
                 docker push ${IMAGE_NAME}
+                docker run -d --name myapp-container -p 4444:4444 ${IMAGE_NAME}
                 """
             }
         }
