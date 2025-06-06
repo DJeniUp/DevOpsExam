@@ -25,16 +25,14 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     script {
-
-                        // Copy application files to the remote server
                         sh """
-                            scp -i $SSH_KEY -r * $SSH_USER@$TARGET_HOST:$TARGET_PATH
-                        """
-
-                        // SSH into the remote server and restart the application
-                        sh """
-                            ssh -i $SSH_KEY $SSH_USER@$TARGET_HOST << EOF
-                            cd $TARGET_PATH
+                            mkdir -p ~/.ssh
+                            ssh-keyscan -H 172.16.0.3 >> ~/.ssh/known_hosts
+        
+                            scp -i $SSH_KEY -r Jenkinsfile index.js index.test.js node_modules package-lock.json package.json ${SSH_USER}@172.16.0.3:/home/${SSH_USER}
+        
+                            ssh -i $SSH_KEY ${SSH_USER}@172.16.0.3 << EOF
+                            cd /home/${SSH_USER}
                             npm install
                             pm2 restart all || pm2 start index.js --name 'my-node-app'
                             EOF
