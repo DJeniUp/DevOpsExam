@@ -35,7 +35,8 @@ pipeline {
                         ssh -i \$SSH_KEY \$SSH_USER@172.16.0.3 bash -c '
                             cd /home/\$SSH_USER || exit
                             npm install
-                            node index.js
+                            screen -S myapp_session -X quit || true  # закриваємо стару сесію, якщо є
+                            screen -dmS myapp_session node index.js
                         '
                     """
                 }
