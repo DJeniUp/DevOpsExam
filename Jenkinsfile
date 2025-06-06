@@ -49,7 +49,7 @@ pipeline {
         }
         stage('Deploy to Docker VM') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'key_jenkins', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         echo "Connecting to VM using SSH key..."
                         ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no laborant@${VM_IP} 'echo OK'
