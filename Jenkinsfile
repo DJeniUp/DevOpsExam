@@ -23,22 +23,17 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-to-target', keyFileVariable: 'KEY')]) {
                     sh '''
                         mkdir -p /var/lib/jenkins/.ssh
                         ssh-keyscan -H 172.16.0.3 >> /var/lib/jenkins/.ssh/known_hosts
-        
                         scp -i $KEY -r Jenkinsfile index.js index.test.js node_modules package-lock.json package.json laborant@172.16.0.3:/home/laborant
-        
-                        ssh -i $KEY laborant@172.16.0.3 '
-                            pkill -f index.js || true
-                            cd /home/laborant
-                            nohup node index.js > app.log 2>&1 &
-                        '
+                        ssh -i $KEY laborant@172.16.0.3 "pkill -f index.js || true && cd /home/laborant && nohup node index.js > app.log 2>&1 &"
                     '''
                 }
             }
         }
+
 
 
 
