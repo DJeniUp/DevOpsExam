@@ -15,14 +15,6 @@ pipeline {
                 sh 'npm install'
             }
         }
-        stage('Free Port 4444') {
-            steps {
-                sh '''
-                lsof -ti tcp:4444 | xargs --no-run-if-empty kill -9 || true
-                sleep 5
-                '''
-            }
-        }
 
 
         stage('Test') {
