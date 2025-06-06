@@ -7,6 +7,7 @@ pipeline {
         TARGET_USER = 'laborant'
         TARGET_HOST = '172.16.0.3'
         TARGET_PATH = '/home/laborant'
+        VM_IP = '172.16.0.4'
     }
 
     stages {
