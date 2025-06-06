@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Deploy to Target') {
             steps {
-                sh "scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -r ./target-folder ${TARGET_USER}@${TARGET_HOST}:${TARGET_PATH}"
+                sh "scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -r . ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}"
                 
                 sh "ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${TARGET_USER}@${TARGET_HOST} 'cd ${TARGET_PATH} && ./deploy-script.sh'"
             }
