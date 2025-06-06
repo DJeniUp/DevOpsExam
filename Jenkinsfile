@@ -23,22 +23,23 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'ssh_key', usernameVariable: 'ssh_user')]) {
-                    sh '''
-                        chmod +x main
+                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                    script {
 
-                        mkdir -p ~/.ssh
-                        ssh-keyscan -H target >> ~/.ssh/known_hosts
+                        // Copy application files to the remote server
+                        sh """
+                            scp -i $SSH_KEY -r * $SSH_USER@$TARGET_HOST:$TARGET_PATH
+                        """
 
-                        scp -i "$ssh_key" main "$ssh_user"@target:
-                        scp -i "$ssh_key" main.service "$ssh_user"@target:~
-
-                        ssh -i "$ssh_key" "$ssh_user"@target << EOF
-                        sudo mv ~/main.service /etc/systemd/system/main.service
-                        sudo systemctl daemon-reload
-                        sudo systemctl enable --now main.service
-                        EOF
-                    '''
+                        // SSH into the remote server and restart the application
+                        sh """
+                            ssh -i $SSH_KEY $SSH_USER@$TARGET_HOST << EOF
+                            cd $TARGET_PATH
+                            npm install
+                            pm2 restart all || pm2 start index.js --name 'my-node-app'
+                            EOF
+                        """
+                    }
                 }
             }
         }
