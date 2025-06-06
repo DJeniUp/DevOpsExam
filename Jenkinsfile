@@ -23,21 +23,21 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
-                    script {
-                        sh """
-                            mkdir -p ~/.ssh
-                            ssh-keyscan -H 172.16.0.3 >> ~/.ssh/known_hosts
+                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins',
+                                                   keyFileVariable: 'SSH_KEY',
+                                                   usernameVariable: 'SSH_USER')]) {
+                    sh """
+                        mkdir -p ~/.ssh
+                        ssh-keyscan -H 172.16.0.3 >> ~/.ssh/known_hosts
         
-                            scp -i $SSH_KEY -r Jenkinsfile index.js index.test.js node_modules package-lock.json package.json ${SSH_USER}@172.16.0.3:/home/${SSH_USER}
+                        scp -i \$SSH_KEY -r Jenkinsfile index.js index.test.js node_modules package-lock.json package.json \$SSH_USER@172.16.0.3:/home/\$SSH_USER
         
-                            ssh -i $SSH_KEY ${SSH_USER}@172.16.0.3 << EOF
-                            cd /home/${SSH_USER}
+                        ssh -i \$SSH_KEY \$SSH_USER@172.16.0.3 bash -c '
+                            cd /home/\$SSH_USER || exit
                             npm install
-                            pm2 restart all || pm2 start index.js --name 'my-node-app'
-                            EOF
-                        """
-                    }
+                            nohup node index.js > app.log 2>&1 &
+                        '
+                    """
                 }
             }
         }
