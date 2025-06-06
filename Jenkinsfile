@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-to-target', keyFileVariable: 'KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'KEY')]) {
                     sh '''
                         mkdir -p /var/lib/jenkins/.ssh
                         ssh-keyscan -H 172.16.0.3 >> /var/lib/jenkins/.ssh/known_hosts
