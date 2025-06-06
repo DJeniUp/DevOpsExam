@@ -13,7 +13,12 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 sh 'npm install'
+            }
+        }
+        stage('Free Port 4444') {
+            steps {
                 sh 'lsof -ti tcp:4444 | xargs -r kill -9 || true'
+                sh 'sleep 3'  // дати час на звільнення порту
             }
         }
 
