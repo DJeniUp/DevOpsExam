@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'node22' // Установи відповідний NodeJS у Jenkins -> Manage Jenkins -> Global Tool Configuration
-    }
-
     environment {
         IMAGE_NAME = 'ttl.sh/myapp:2h'
     }
