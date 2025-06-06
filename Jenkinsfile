@@ -35,7 +35,7 @@ pipeline {
                         ssh -i \$SSH_KEY \$SSH_USER@172.16.0.3 bash -c '
                             cd /home/\$SSH_USER || exit
                             npm install
-                            nohup node index.js > app.log 2>&1 &
+                            node index.js
                         '
                     """
                 }
