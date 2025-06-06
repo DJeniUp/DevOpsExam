@@ -17,6 +17,20 @@ pipeline {
                 sh 'node --test index.test.js'
             }
         }
+        stage('Deploy to Target') {
+            steps {
+                sshagent (credentials: ['key-jenkins']) {
+                    sh """
+                        scp -o StrictHostKeyChecking=no index.js laborant@172.16.0.3:/home/laborant/
+                        ssh -o StrictHostKeyChecking=no laborant@172.16.0.3 '
+                            pkill -f "node index.js" || true
+                            nohup node /home/laborant/index.js > output.log 2>&1 &
+                        '
+                    """
+                }
+            }
+        }
+
 
         stage('Build Docker Image') {
             steps {
