@@ -23,21 +23,19 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins',
-                                                   keyFileVariable: 'SSH_KEY',
-                                                   usernameVariable: 'SSH_USER')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'key-jenkins', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     sh """
                         mkdir -p ~/.ssh
                         ssh-keyscan -H 172.16.0.3 >> ~/.ssh/known_hosts
         
                         scp -i \$SSH_KEY -r Jenkinsfile index.js index.test.js node_modules package-lock.json package.json \$SSH_USER@172.16.0.3:/home/\$SSH_USER
         
-                        ssh -i \$SSH_KEY \$SSH_USER@172.16.0.3 bash -c '
-                            cd /home/\$SSH_USER || exit
-                            npm install
-                            screen -S myapp_session -X quit || true  # закриваємо стару сесію, якщо є
-                            screen -dmS myapp_session node index.js
-                        '
+                        ssh -i \$SSH_KEY \$SSH_USER@172.16.0.3 "bash -c '
+                          cd /home/\$SSH_USER || exit
+                          npm install
+                          screen -S myapp_session -X quit || true
+                          screen -dmS myapp_session node index.js
+                        '"
                     """
                 }
             }
