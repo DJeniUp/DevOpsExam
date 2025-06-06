@@ -13,6 +13,7 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 sh 'npm install'
+                sh 'lsof -ti tcp:4444 | xargs -r kill -9 || true'
             }
         }
 
